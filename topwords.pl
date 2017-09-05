@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# v0.01 - initial.
+# v0.02 - Min word length limit added.
+
 # Usage: perl topwords.pl /f:<file path>
 
 use strict;
@@ -26,6 +29,7 @@ sub print_top_words;
 my $out = *STDOUT;
 my $infile;
 my %topwords = ();
+my $min_word_length = 1;
 
 #binmode(STDIN, ':utf8' );
 #binmode(STDOUT, ':utf8' );
@@ -37,9 +41,14 @@ foreach my $arg (@ARGV)
 		$infile = $+{infile};
 		printf $out "Input file: ".$infile."\n";
 	}
+	elsif ($arg =~ m{^(-|/)ml:(?<len>\d+)}i)
+	{
+		$min_word_length = $+{len};
+		printf $out "Minimum word length: ".$min_word_length."\n";
+	}
 	else
 	{
-		die "Usage: $0 /f:<file path>\n";
+		die "Usage: $0 /f:<file path> /ml:<minimum word length>\n"
 	}
 }
 
@@ -97,6 +106,8 @@ sub parse_string()
 	foreach my $word (@words)
 	{
 		next if $word eq "";
+
+		next if length($word) < $min_word_length; 
 
 		foreach my $lang (@languages)
 		{
